@@ -1,3 +1,4 @@
+//
 // ignore_for_file: subtype_of_sealed_class, lines_longer_than_80_chars, prefer_const_constructors
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -43,11 +44,13 @@ void main() {
     );
     // Fallback for the converter functions
     registerFallbackValue(
-      (DocumentSnapshot<Map<String, dynamic>> snapshot, SnapshotOptions? options) =>
+      (DocumentSnapshot<Map<String, dynamic>> snapshot,
+              SnapshotOptions? options,) =>
           _MockSource(), // Dummy return
     );
     registerFallbackValue(
-      (client.Source source, SetOptions? options) => <String, dynamic>{}, // Dummy return
+      (client.Source source, SetOptions? options) =>
+          <String, dynamic>{}, // Dummy return
     );
   });
 
@@ -454,8 +457,7 @@ void main() {
           'throws SourceFetchFailure when fromFirestore converter throws (simulated via data())',
           () async {
         // Arrange
-        final converterException =
-            Exception('Simulated converter error');
+        final converterException = Exception('Simulated converter error');
         when(() => mockTypedDocSnapshot.exists).thenReturn(true);
         // Make the data() call itself throw, simulating converter failure
         when(() => mockTypedDocSnapshot.data()).thenThrow(converterException);
@@ -582,7 +584,7 @@ void main() {
         verifyNever(() => mockTypedQuerySnapshot.docs);
       });
 
-       // Test case specifically for the fromFirestore converter throwing in list
+      // Test case specifically for the fromFirestore converter throwing in list
       test(
           'throws SourceFetchFailure when fromFirestore converter throws in list (simulated via data())',
           () async {
@@ -590,7 +592,8 @@ void main() {
         final converterException = Exception('Simulated list converter error');
         // Make one of the data() calls throw
         when(() => mockTypedQueryDocSnapshot1.data()).thenReturn(source1);
-        when(() => mockTypedQueryDocSnapshot2.data()).thenThrow(converterException);
+        when(() => mockTypedQueryDocSnapshot2.data())
+            .thenThrow(converterException);
 
         final typedDocSnapshots = [
           mockTypedQueryDocSnapshot1,
