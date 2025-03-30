@@ -44,8 +44,10 @@ void main() {
     );
     // Fallback for the converter functions
     registerFallbackValue(
-      (DocumentSnapshot<Map<String, dynamic>> snapshot,
-              SnapshotOptions? options,) =>
+      (
+        DocumentSnapshot<Map<String, dynamic>> snapshot,
+        SnapshotOptions? options,
+      ) =>
           _MockSource(), // Dummy return
     );
     registerFallbackValue(
