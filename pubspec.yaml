@@ -1,5 +1,6 @@
 name: ht_sources_firebase
 description: ...
+repository: https://github.com/headlines-toolkit/ht-sources-firebase
 publish_to: none
 
 environment:
@@ -9,6 +10,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  ht_sources_client:
+    git:
+      url: https://github.com/headlines-toolkit/ht-sources-client.git
 
 dev_dependencies:
   flutter_test:
