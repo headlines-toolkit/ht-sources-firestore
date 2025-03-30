@@ -28,7 +28,6 @@ class _MockRawQuerySnapshot extends Mock
 class _MockRawQueryDocumentSnapshot extends Mock
     implements QueryDocumentSnapshot<Map<String, dynamic>> {}
 
-
 // Typed Mocks (These are what the HtSourcesFirestore class interacts with)
 class _MockTypedCollectionReference extends Mock
     implements CollectionReference<client.Source> {}
@@ -837,7 +836,8 @@ void main() {
     test('fromFirestore successfully converts snapshot data', () {
       // Arrange
       when(() => mockRawSnapshot.data()).thenReturn(testSourceJson);
-      when(() => mockRawSnapshot.id).thenReturn(testSource.id); // Needed for potential error message
+      when(() => mockRawSnapshot.id)
+          .thenReturn(testSource.id); // Needed for potential error message
 
       // Act
       final result = fromFirestore(mockRawSnapshot, null);
@@ -862,7 +862,8 @@ void main() {
               .having(
                 (e) => e.message,
                 'message',
-                contains('Firestore snapshot data was null for id null-data-test-id'),
+                contains(
+                    'Firestore snapshot data was null for id null-data-test-id',),
               ),
         ),
       );
