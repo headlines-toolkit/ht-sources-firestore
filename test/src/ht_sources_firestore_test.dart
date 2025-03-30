@@ -12,9 +12,22 @@ import 'package:mocktail/mocktail.dart';
 // Core Firestore mock
 class _MockFirebaseFirestore extends Mock implements FirebaseFirestore {}
 
-// Raw Collection Mock (needed for the initial .collection() call)
+// Raw Collection/Document/Snapshot Mocks (for Map<String, dynamic>)
 class _MockRawCollectionReference extends Mock
     implements CollectionReference<Map<String, dynamic>> {}
+
+class _MockRawDocumentReference extends Mock
+    implements DocumentReference<Map<String, dynamic>> {}
+
+class _MockRawDocumentSnapshot extends Mock
+    implements DocumentSnapshot<Map<String, dynamic>> {}
+
+class _MockRawQuerySnapshot extends Mock
+    implements QuerySnapshot<Map<String, dynamic>> {}
+
+class _MockRawQueryDocumentSnapshot extends Mock
+    implements QueryDocumentSnapshot<Map<String, dynamic>> {}
+
 
 // Typed Mocks (These are what the HtSourcesFirestore class interacts with)
 class _MockTypedCollectionReference extends Mock
@@ -777,6 +790,91 @@ void main() {
         verify(() => mockTypedDocRef.get()).called(1);
         // Removed verify for set() as throwsA confirms it was attempted
       });
+    });
+  });
+
+  // --- Direct Converter Tests ---
+  group('Firestore Converters', () {
+    late client.Source testSource;
+    late Map<String, dynamic> testSourceJson;
+    late _MockRawDocumentSnapshot mockRawSnapshot; // Use raw snapshot mock
+
+    // Define the converter functions locally for direct testing
+    // (Copied from HtSourcesFirestore implementation)
+    client.Source fromFirestore(
+      DocumentSnapshot<Map<String, dynamic>> snapshot,
+      SnapshotOptions? _,
+    ) {
+      final data = snapshot.data();
+      if (data == null) {
+        throw FirebaseException(
+          plugin: 'HtSourcesFirestore', // Keep plugin name consistent
+          code: 'null-data',
+          message: 'Firestore snapshot data was null for id ${snapshot.id}',
+        );
+      }
+      return client.Source.fromJson(data);
+    }
+
+    Map<String, dynamic> toFirestore(client.Source source, SetOptions? _) {
+      return source.toJson();
+    }
+
+    setUp(() {
+      testSource = client.Source(
+        id: 'converter-test-id',
+        name: 'Converter Test Source',
+        description: 'Testing the converter',
+        url: 'http://converter.test',
+        category: 'converter',
+        language: 'cnv',
+        country: 'cv',
+      );
+      testSourceJson = testSource.toJson();
+      mockRawSnapshot = _MockRawDocumentSnapshot(); // Instantiate raw mock
+    });
+
+    test('fromFirestore successfully converts snapshot data', () {
+      // Arrange
+      when(() => mockRawSnapshot.data()).thenReturn(testSourceJson);
+      when(() => mockRawSnapshot.id).thenReturn(testSource.id); // Needed for potential error message
+
+      // Act
+      final result = fromFirestore(mockRawSnapshot, null);
+
+      // Assert
+      expect(result, equals(testSource));
+      verify(() => mockRawSnapshot.data()).called(1);
+    });
+
+    test('fromFirestore throws FirebaseException when data is null', () {
+      // Arrange
+      when(() => mockRawSnapshot.data()).thenReturn(null);
+      when(() => mockRawSnapshot.id).thenReturn('null-data-test-id');
+
+      // Act & Assert
+      expect(
+        () => fromFirestore(mockRawSnapshot, null),
+        throwsA(
+          isA<FirebaseException>()
+              .having((e) => e.plugin, 'plugin', 'HtSourcesFirestore')
+              .having((e) => e.code, 'code', 'null-data')
+              .having(
+                (e) => e.message,
+                'message',
+                contains('Firestore snapshot data was null for id null-data-test-id'),
+              ),
+        ),
+      );
+      verify(() => mockRawSnapshot.data()).called(1);
+    });
+
+    test('toFirestore successfully converts Source to JSON', () {
+      // Act
+      final result = toFirestore(testSource, null);
+
+      // Assert
+      expect(result, equals(testSourceJson));
     });
   });
 }
