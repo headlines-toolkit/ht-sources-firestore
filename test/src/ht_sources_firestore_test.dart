@@ -16,17 +16,8 @@ class _MockFirebaseFirestore extends Mock implements FirebaseFirestore {}
 class _MockRawCollectionReference extends Mock
     implements CollectionReference<Map<String, dynamic>> {}
 
-class _MockRawDocumentReference extends Mock
-    implements DocumentReference<Map<String, dynamic>> {}
-
 class _MockRawDocumentSnapshot extends Mock
     implements DocumentSnapshot<Map<String, dynamic>> {}
-
-class _MockRawQuerySnapshot extends Mock
-    implements QuerySnapshot<Map<String, dynamic>> {}
-
-class _MockRawQueryDocumentSnapshot extends Mock
-    implements QueryDocumentSnapshot<Map<String, dynamic>> {}
 
 // Typed Mocks (These are what the HtSourcesFirestore class interacts with)
 class _MockTypedCollectionReference extends Mock
@@ -863,7 +854,8 @@ void main() {
                 (e) => e.message,
                 'message',
                 contains(
-                    'Firestore snapshot data was null for id null-data-test-id',),
+                  'Firestore snapshot data was null for id null-data-test-id',
+                ),
               ),
         ),
       );
