@@ -1,5 +1,5 @@
 name: ht_sources_firestore
-description: ...
+description: Firestore implementation of the HtSourcesClient interface.
 repository: https://github.com/headlines-toolkit/ht-sources-firebase
 publish_to: none
 
@@ -8,6 +8,7 @@ environment:
   flutter: ^3.24.0
 
 dependencies:
+  cloud_firestore: ^5.6.5
   flutter:
     sdk: flutter
   ht_sources_client:
