@@ -1,4 +1,4 @@
 /// A Firestore implementation for managing news sources.
-library ht_sources_firestore;
+library;
 
 export 'src/ht_sources_firestore.dart';

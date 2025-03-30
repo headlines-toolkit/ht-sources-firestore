@@ -18,36 +18,37 @@ class HtSourcesFirestore implements client.HtSourcesClient {
   /// The Firestore collection reference for sources.
   /// Uses a converter to automatically map between [client.Source] objects and
   /// Firestore documents.
-  late final CollectionReference<client.Source> _sourcesCollection =
-      _firestore.collection('sources').withConverter<client.Source>(
-            fromFirestore: (snapshot, _) {
-              final data = snapshot.data();
-              if (data == null) {
-                // This should ideally not happen if snapshot.exists is true,
-                // but handle defensively.
-                throw FirebaseException(
-                  plugin: 'HtSourcesFirestore',
-                  code: 'null-data',
-                  message: 'Firestore snapshot data was null for id ${snapshot.id}',
-                );
-              }
-              return client.Source.fromJson(data);
-            },
-            toFirestore: (source, _) => source.toJson(),
-          );
+  late final CollectionReference<client.Source> _sourcesCollection = _firestore
+      .collection('sources')
+      .withConverter<client.Source>(
+        fromFirestore: (snapshot, _) {
+          final data = snapshot.data();
+          if (data == null) {
+            // This should ideally not happen if snapshot.exists is true,
+            // but handle defensively.
+            throw FirebaseException(
+              plugin: 'HtSourcesFirestore',
+              code: 'null-data',
+              message: 'Firestore snapshot data was null for id ${snapshot.id}',
+            );
+          }
+          return client.Source.fromJson(data);
+        },
+        toFirestore: (source, _) => source.toJson(),
+      );
 
   @override
   Future<client.Source> createSource({required client.Source source}) async {
     try {
       await _sourcesCollection.doc(source.id).set(source);
       return source;
-    } on FirebaseException catch (e, stackTrace) {
+    } on FirebaseException catch (e) {
       // Log the error internally if needed
       // print('Firestore Error creating source: $e\n$stackTrace');
       throw client.SourceCreateFailure(
         'Failed to create source in Firestore: ${e.message} (${e.code})',
       );
-    } catch (e, stackTrace) {
+    } catch (e) {
       // Catch any other unexpected errors
       // print('Unexpected Error creating source: $e\n$stackTrace');
       throw client.SourceCreateFailure('An unexpected error occurred: $e');
@@ -65,7 +66,7 @@ class HtSourcesFirestore implements client.HtSourcesClient {
       }
 
       await docRef.delete();
-    } on FirebaseException catch (e, stackTrace) {
+    } on FirebaseException catch (e) {
       // Log the error internally if needed
       // print('Firestore Error deleting source: $e\n$stackTrace');
       throw client.SourceDeleteFailure(
@@ -73,7 +74,7 @@ class HtSourcesFirestore implements client.HtSourcesClient {
       );
     } on client.SourceNotFoundException {
       rethrow; // Re-throw specific exception
-    } catch (e, stackTrace) {
+    } catch (e) {
       // Catch any other unexpected errors
       // print('Unexpected Error deleting source: $e\n$stackTrace');
       throw client.SourceDeleteFailure('An unexpected error occurred: $e');
@@ -94,10 +95,12 @@ class HtSourcesFirestore implements client.HtSourcesClient {
         // This case should theoretically not happen if snapshot.exists is true
         // and the converter works, but handle defensively. It's already handled
         // inside the fromFirestore converter, but checking here adds safety.
-        throw client.SourceFetchFailure('Failed to parse source data for id: $id');
+        throw client.SourceFetchFailure(
+          'Failed to parse source data for id: $id',
+        );
       }
       return source;
-    } on FirebaseException catch (e, stackTrace) {
+    } on FirebaseException catch (e) {
       // Log the error internally if needed
       // print('Firestore Error getting source: $e\n$stackTrace');
       throw client.SourceFetchFailure(
@@ -105,7 +108,7 @@ class HtSourcesFirestore implements client.HtSourcesClient {
       );
     } on client.SourceNotFoundException {
       rethrow; // Re-throw specific exception
-    } catch (e, stackTrace) {
+    } catch (e) {
       // Catch any other unexpected errors
       // print('Unexpected Error getting source: $e\n$stackTrace');
       throw client.SourceFetchFailure('An unexpected error occurred: $e');
@@ -118,13 +121,13 @@ class HtSourcesFirestore implements client.HtSourcesClient {
       final querySnapshot = await _sourcesCollection.get();
       // The converter handles the data extraction and parsing for each doc
       return querySnapshot.docs.map((doc) => doc.data()).toList();
-    } on FirebaseException catch (e, stackTrace) {
+    } on FirebaseException catch (e) {
       // Log the error internally if needed
       // print('Firestore Error getting sources: $e\n$stackTrace');
       throw client.SourceFetchFailure(
         'Failed to get sources from Firestore: ${e.message} (${e.code})',
       );
-    } catch (e, stackTrace) {
+    } catch (e) {
       // Catch any other unexpected errors
       // print('Unexpected Error getting sources: $e\n$stackTrace');
       throw client.SourceFetchFailure('An unexpected error occurred: $e');
@@ -141,10 +144,11 @@ class HtSourcesFirestore implements client.HtSourcesClient {
         throw const client.SourceNotFoundException();
       }
 
-      // Use set with merge: true or update. Set is often simpler with converters.
+      // Use set with merge: true or update.
+      // Set is often simpler with converters.
       await docRef.set(source); // Overwrites with the new source data
       return source;
-    } on FirebaseException catch (e, stackTrace) {
+    } on FirebaseException catch (e) {
       // Log the error internally if needed
       // print('Firestore Error updating source: $e\n$stackTrace');
       throw client.SourceUpdateFailure(
@@ -152,7 +156,7 @@ class HtSourcesFirestore implements client.HtSourcesClient {
       );
     } on client.SourceNotFoundException {
       rethrow; // Re-throw specific exception
-    } catch (e, stackTrace) {
+    } catch (e) {
       // Catch any other unexpected errors
       // print('Unexpected Error updating source: $e\n$stackTrace');
       throw client.SourceUpdateFailure('An unexpected error occurred: $e');
