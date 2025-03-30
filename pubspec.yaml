@@ -1,4 +1,4 @@
-name: ht_sources_firebase
+name: ht_sources_firestore
 description: ...
 repository: https://github.com/headlines-toolkit/ht-sources-firebase
 publish_to: none
