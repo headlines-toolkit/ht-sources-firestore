@@ -2,7 +2,7 @@
 
 Firestore implementation of the `HtSourcesClient` interface. Handles communication with Cloud Firestore to manage news source data.
 
-This package is part of the Headlines Toolkit project.
+This package is part of **the** Headlines Toolkit project.
 
 ## Features
 
@@ -68,9 +68,29 @@ Future<void> main() async {
     final fetchedSource = await sourcesClient.getSource(id: 'unique-source-id');
     print('Source fetched: ${fetchedSource.name}');
 
-    // Example: Get all sources
-    final allSources = await sourcesClient.getSources();
-    print('Fetched ${allSources.length} sources.');
+    // Example: Get sources with pagination (first page, limit 5)
+    final firstPageSources = await sourcesClient.getSources(limit: 5);
+    print('Fetched ${firstPageSources.length} sources on the first page.');
+    String? lastSourceId;
+    if (firstPageSources.isNotEmpty) {
+      lastSourceId = firstPageSources.last.id;
+      print('Last source ID on first page: $lastSourceId');
+    }
+
+    // Example: Get the next page of sources (if available)
+    if (lastSourceId != null) {
+      final nextPageSources = await sourcesClient.getSources(
+        limit: 5,
+        startAfterId: lastSourceId,
+      );
+      print('Fetched ${nextPageSources.length} sources on the next page.');
+    }
+
+    // Example: Get all sources (without pagination)
+    // Note: Be cautious with large datasets in production.
+    // final allSources = await sourcesClient.getSources();
+    // print('Fetched ${allSources.length} sources in total.');
+
 
     // Example: Update a source
     final updatedSourceData = fetchedSource.copyWith(
