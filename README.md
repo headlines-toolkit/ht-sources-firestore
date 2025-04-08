@@ -23,7 +23,7 @@ dependencies:
       url: https://github.com/headlines-toolkit/ht-sources-client.git
   ht_sources_firestore:
     git:
-      url: https://github.com/headlines-toolkit/ht-sources-firebase.git
+      url: https://github.com/headlines-toolkit/ht-sources-firestore.git
       # Optional: specify a ref (branch, tag, commit)
       # ref: main
 ```
